@@ -1,7 +1,7 @@
 /* Copyright (C) 2017 Daniel Page <csdsp@bristol.ac.uk>
  *
- * Use of this source code is restricted per the CC BY-NC-ND license, a copy of 
- * which can be found via http://creativecommons.org (and should be included as 
+ * Use of this source code is restricted per the CC BY-NC-ND license, a copy of
+ * which can be found via http://creativecommons.org (and should be included as
  * LICENSE.txt within the associated archive or repository).
  */
 
@@ -10,9 +10,9 @@
 void hilevel_handler_rst() {
   /* Configure the mechanism for interrupt handling by
    *
-   * - configuring timer st. it raises a (periodic) interrupt for each 
+   * - configuring timer st. it raises a (periodic) interrupt for each
    *   timer tick,
-   * - configuring GIC st. the selected interrupts are forwarded to the 
+   * - configuring GIC st. the selected interrupts are forwarded to the
    *   processor via the IRQ interrupt signal, then
    * - enabling IRQ interrupts.
    */
@@ -41,7 +41,8 @@ void hilevel_handler_irq() {
   // Step 4: handle the interrupt, then clear (or reset) the source.
 
   if( id == GIC_SOURCE_TIMER0 ) {
-    PL011_putc( UART0, 'T', true ); TIMER0->Timer1IntClr = 0x01;
+    PL011_putc( UART0, 'T', true );
+    TIMER0->Timer1IntClr = 0x01;
   }
 
   // Step 5: write the interrupt identifier to signal we're done.
