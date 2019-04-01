@@ -94,17 +94,13 @@ return;
 
 
 
-}
-
-
-
-  return;
-}
-
 extern void     main_P3();
 extern uint32_t tos_P3;
 extern void     main_P4();
 extern uint32_t tos_P4;
+extern void     main_P5();
+extern uint32_t tos_P5;
+
 
 void hilevel_handler_rst() {
   /* Configure the mechanism for interrupt handling by
