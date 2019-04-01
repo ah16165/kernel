@@ -43,16 +43,16 @@ int current_pcb_index;
 int next_pcb_index = 0;
 
 //age all programs by 1
-while(i< program_max){
-  if (pcb[i].pri != program_max){
-    pcb[i].pri = pcb[i].pri + 1;}
-
-  else {
-    pcb[i].pri = 0;
-  }
-  i++;
-
-}
+// while(i< program_max){
+//   if (pcb[i].pri != program_max){
+//     pcb[i].pri = pcb[i].pri + 1;}
+//
+//   else {
+//     pcb[i].pri = 0;
+//   }
+//   i++;
+//
+// }
 
 // find the current program pcb index
  while(j< program_max){
@@ -77,7 +77,7 @@ pcb[next_pcb_index].pri = 0;
 
 
 // if the next and the current are the same then do nothing
-if (pcb[current_pcb_index].pid == pcb[next_pcb_index].pid){return;}
+if (current_pcb_index == next_pcb_index){return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
