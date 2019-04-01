@@ -41,6 +41,8 @@
 
 typedef int pid_t;
 
+#define program_max 10
+
 typedef enum {
   STATUS_CREATED,
   STATUS_READY,
@@ -57,6 +59,7 @@ typedef struct {
      pid_t    pid;
   status_t status;
      ctx_t    ctx;
+     int pri;
 } pcb_t;
 
 #endif

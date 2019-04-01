@@ -8,7 +8,8 @@
 #include "hilevel.h"
 
 
-pcb_t pcb[ 2 ]; pcb_t* current = NULL;
+pcb_t pcb[ program_max ];
+pcb_t* current = NULL;
 
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
@@ -35,18 +36,67 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
 }
 
 void schedule( ctx_t* ctx ) {
-  if     ( current->pid == pcb[ 0 ].pid ) {
-    dispatch( ctx, &pcb[ 0 ], &pcb[ 1 ] );      // context switch P_1 -> P_2
+int i = 0;
+int j = 0;
+int k = 0;
+int current_pcb_index;
+int next_pcb_index = 0;
 
-    pcb[ 0 ].status = STATUS_READY;             // update   execution status  of P_1
-    pcb[ 1 ].status = STATUS_EXECUTING;         // update   execution status  of P_2
-  }
-  else if( current->pid == pcb[ 1 ].pid ) {
-    dispatch( ctx, &pcb[ 1 ], &pcb[ 0 ] );      // context switch P_2 -> P_1
+//age all programs by 1
+while(i< program_max){
+  if (pcb[i].priority != program_max){
+    pcb[i].priority = pcb[i].priority + 1;}
 
-    pcb[ 1 ].status = STATUS_READY;             // update   execution status  of P_2
-    pcb[ 0 ].status = STATUS_EXECUTING;         // update   execution status  of P_1
+  else {
+    pcb[i].priority = 0;
   }
+  i++;
+
+}
+
+// find the current program pcb index
+ while(j< program_max){
+    if(pcb[j].pid == current.pid){
+      current_pcb_index = j;
+    }
+    j++;
+
+    }
+
+// find the next program pcb index
+while(k< program_max){
+   if(pcb[k].priority > pcb[next_pcb_index].priority){
+     next_pcb_index = k;
+   }
+   k++;
+   }
+
+
+//set the next pcb priority to 0
+pcb[next_pcb_index].priority = 0;
+
+
+// if the next and the current are the same then do nothing
+if (current.pcb== next.pcb){return;}
+
+// otherwise do a dispatch and update excecution status'
+else{
+
+dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
+
+pcb[current_pcb_index].status = STATUS_READY;
+pcb[next_pcb_index].status = STATUS_EXCECUTING;
+
+return;
+
+
+}
+
+
+
+}
+
+
 
   return;
 }
