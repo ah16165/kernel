@@ -79,8 +79,7 @@ else{
 
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
 
-current = &pcb[next_pcb_index];
-TIMER0->Timer1IntClr = 0x01;  
+current = &pcb[next_pcb_index];  
 
 pcb[current_pcb_index].status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;}
