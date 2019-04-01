@@ -56,7 +56,7 @@ while(i< program_max){
 
 // find the current program pcb index
  while(j< program_max){
-    if(pcb[j].pid == current.pid){
+    if(pcb[j].pid == current->pid){
       current_pcb_index = j;
     }
     j++;
