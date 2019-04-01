@@ -147,6 +147,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P5 );
     pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P5  );
 
+current = &pcb[ 0 ];
 dispatch( ctx, NULL, &pcb[ 0 ] );
 
   return;
