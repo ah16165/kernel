@@ -44,11 +44,11 @@ int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  if (pcb[i].priority != program_max){
-    pcb[i].priority = pcb[i].priority + 1;}
+  if (pcb[i].pri != program_max){
+    pcb[i].pri = pcb[i].pri + 1;}
 
   else {
-    pcb[i].priority = 0;
+    pcb[i].pri = 0;
   }
   i++;
 
@@ -65,7 +65,7 @@ while(i< program_max){
 
 // find the next program pcb index
 while(k< program_max){
-   if(pcb[k].priority > pcb[next_pcb_index].priority){
+   if(pcb[k].pri > pcb[next_pcb_index].pri){
      next_pcb_index = k;
    }
    k++;
@@ -73,7 +73,7 @@ while(k< program_max){
 
 
 //set the next pcb priority to 0
-pcb[next_pcb_index].priority = 0;
+pcb[next_pcb_index].pri = 0;
 
 
 // if the next and the current are the same then do nothing
