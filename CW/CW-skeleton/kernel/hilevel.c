@@ -30,7 +30,7 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
     PL011_putc( UART0, next_pid, true );
     PL011_putc( UART0, ']',      true );
 
-    current = next;                             // update   executing index   to P_{next}
+                               // update   executing index   to P_{next}
 
   return;
 }
@@ -78,6 +78,8 @@ if (current_pcb_index == next_pcb_index){return;}
 else{
 
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
+
+current = &pcb[next_pcb_index];  
 
 pcb[current_pcb_index].status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;}
