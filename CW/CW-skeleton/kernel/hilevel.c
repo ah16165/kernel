@@ -77,7 +77,7 @@ pcb[next_pcb_index].pri = 0;
 
 
 // if the next and the current are the same then do nothing
-if (current.pcb== next.pcb){return;}
+if (pcb[current_pcb_index].pid == pcb[next_pcb_index].pid){return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
@@ -85,7 +85,7 @@ else{
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
 
 pcb[current_pcb_index].status = STATUS_READY;
-pcb[next_pcb_index].status = STATUS_EXCECUTING;
+pcb[next_pcb_index].status = STATUS_EXCECUTING;}
 
 return;
 
