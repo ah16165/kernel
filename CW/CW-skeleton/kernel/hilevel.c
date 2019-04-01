@@ -9,7 +9,7 @@
 
 
 pcb_t pcb[ program_max ];
-pcb_t *current = NULL;
+pcb_t* current = NULL;
 
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
