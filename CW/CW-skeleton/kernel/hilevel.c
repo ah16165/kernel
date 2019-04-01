@@ -124,7 +124,7 @@ void hilevel_handler_rst() {
   GICC0->CTLR         = 0x00000001; // enable GIC interface
   GICD0->CTLR         = 0x00000001; // enable GIC distributor
 
-  int_enable_irq();
+  int_enable_irq(ctx_t* ctx);
 
   memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );     // initialise 0-th PCB = P_1
     pcb[ 0 ].pid      = 1;
