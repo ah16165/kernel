@@ -102,7 +102,7 @@ extern void     main_P5();
 extern uint32_t tos_P5;
 
 
-void hilevel_handler_rst() {
+void hilevel_handler_rst(ctx_t* ctx) {
   /* Configure the mechanism for interrupt handling by
    *
    * - configuring timer st. it raises a (periodic) interrupt for each
@@ -124,7 +124,7 @@ void hilevel_handler_rst() {
   GICC0->CTLR         = 0x00000001; // enable GIC interface
   GICD0->CTLR         = 0x00000001; // enable GIC distributor
 
-  int_enable_irq(ctx_t* ctx);
+  int_enable_irq();
 
   memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );     // initialise 0-th PCB = P_1
     pcb[ 0 ].pid      = 1;
