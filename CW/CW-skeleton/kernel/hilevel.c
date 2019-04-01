@@ -9,7 +9,7 @@
 
 
 pcb_t pcb[ program_max ];
-pcb_t* current = NULL;
+pcb_t *current = NULL;
 
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
@@ -85,7 +85,7 @@ else{
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
 
 pcb[current_pcb_index].status = STATUS_READY;
-pcb[next_pcb_index].status = STATUS_EXCECUTING;}
+pcb[next_pcb_index].status = STATUS_EXECUTING;}
 
 return;
 
