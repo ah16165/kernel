@@ -44,12 +44,7 @@ int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  if (pcb[i].pri != program_max){
-    pcb[i].pri = pcb[i].pri + 1;}
-
-  else {
-    pcb[i].pri = 0;
-  }
+  pcb[i].pri = pcb[i].pri + 1;
   i++;
 
 }
