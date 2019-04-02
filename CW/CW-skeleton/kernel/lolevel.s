@@ -22,7 +22,7 @@ lolevel_handler_rst: bl    int_init                @ initialise interrupt vector
 
 
 lolevel_handler_irq: sub   lr, lr, #4              @ correct return address
-                     sub   sp, sp, #60             @ update SVC mode stack     sp = sp - 60
+                     sub   sp, sp, #60             @ update SVC mode stack
                      stmia sp, { r0-r12, sp, lr }^ @ store  USR registers
                      mrs   r0, spsr                @ get    USR        CPSR
                      stmdb sp!, { r0, lr }         @ store  USR PC and CPSR

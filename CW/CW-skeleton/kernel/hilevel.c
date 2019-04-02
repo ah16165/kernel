@@ -10,6 +10,35 @@
 
 pcb_t pcb[ program_max ];
 pcb_t* current = NULL;
+int programme_count = 0;
+
+int find_current_pcb(){
+  int j=0;
+  while(j< program_max){
+     if(pcb[j].pid == current->pid){
+       return j;
+     }
+     j++;
+
+     }
+
+
+}
+
+int next_pcb_slot(){
+  int i =0;
+  while(i< program_max){
+    if (pcb[i].pri == 0){
+      return i;
+    }
+    else{
+      if (pcb[i] == NULL){
+        return i;
+      }
+    }
+    i++;
+  }
+}
 
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
@@ -37,38 +66,33 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
 
 void schedule( ctx_t* ctx ) {
 int i = 0;
-int j = 0;
 int k = 0;
 int current_pcb_index;
 int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  pcb[i].pri = pcb[i].pri + 1;
+  if (pcb[i].pri != 0){
+    pcb[i].age = pcb[i].age + 1;}
   i++;
 
 }
 
 // find the current program pcb index
- while(j< program_max){
-    if(pcb[j].pid == current->pid){
-      current_pcb_index = j;
-    }
-    j++;
 
-    }
+current_pcb_index = find_current_pcb();
 
 // find the next program pcb index
 while(k< program_max){
-   if(pcb[k].pri > pcb[next_pcb_index].pri){
+   if((pcb[k].pri + pcb[k].age > pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
      next_pcb_index = k;
    }
    k++;
    }
 
 
-//set the next pcb priority to 0
-pcb[next_pcb_index].pri = 0;
+//set the next pcb age to 0
+pcb[next_pcb_index].age = 0;
 
 
 // if the next and the current are the same then do nothing
@@ -79,10 +103,12 @@ else{
 
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
 
-current = &pcb[next_pcb_index];  
+
+TIMER0->Timer1IntClr = 0x01;
 
 pcb[current_pcb_index].status = STATUS_READY;
-pcb[next_pcb_index].status = STATUS_EXECUTING;}
+pcb[next_pcb_index].status = STATUS_EXECUTING;
+current = &pcb[next_pcb_index];}
 
 return;
 
@@ -91,12 +117,14 @@ return;
 
 
 
-extern void     main_P3();
-extern uint32_t tos_P3;
-extern void     main_P4();
-extern uint32_t tos_P4;
-extern void     main_P5();
-extern uint32_t tos_P5;
+// extern void     main_P3();
+// extern uint32_t tos_P3;
+// extern void     main_P4();
+// extern uint32_t tos_P4;
+// extern void     main_P5();
+// extern uint32_t tos_P5;
+extern void     main_console();
+extern uint32_t tos_console;
 
 
 void hilevel_handler_rst(ctx_t* ctx) {
@@ -123,26 +151,34 @@ void hilevel_handler_rst(ctx_t* ctx) {
 
   int_enable_irq();
 
-  memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );     // initialise 0-th PCB = P_1
+  memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );     // initialise console
     pcb[ 0 ].pid      = 1;
     pcb[ 0 ].status   = STATUS_CREATED;
     pcb[ 0 ].ctx.cpsr = 0x50;
-    pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_P3 );
-    pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_P3  );
+    pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
+    pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_console  );
+    pcb[0].age = 100;
+    pcb[0].pri = 100;
 
-    memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
-    pcb[ 1 ].pid      = 2;
-    pcb[ 1 ].status   = STATUS_CREATED;
-    pcb[ 1 ].ctx.cpsr = 0x50;
-    pcb[ 1 ].ctx.pc   = ( uint32_t )( &main_P4 );
-    pcb[ 1 ].ctx.sp   = ( uint32_t )( &tos_P4  );
+    programme_count = 1;
 
-    memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
-    pcb[ 2 ].pid      = 3;
-    pcb[ 2 ].status   = STATUS_CREATED;
-    pcb[ 2 ].ctx.cpsr = 0x50;
-    pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P5 );
-    pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P5  );
+    // memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
+    // pcb[ 1 ].pid      = 2;
+    // pcb[ 1 ].status   = STATUS_CREATED;
+    // pcb[ 1 ].ctx.cpsr = 0x50;
+    // pcb[ 1 ].ctx.pc   = ( uint32_t )( &main_P4 );
+    // pcb[ 1 ].ctx.sp   = ( uint32_t )( &tos_P4  );
+    // pcb[1].age = 0;
+    // pcb[1].pri = 10;
+    //
+    // memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
+    // pcb[ 2 ].pid      = 3;
+    // pcb[ 2 ].status   = STATUS_CREATED;
+    // pcb[ 2 ].ctx.cpsr = 0x50;
+    // pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P5 );
+    // pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P5  );
+    // pcb[2].age = 0;
+    // pcb[2].pri = 5;
 
 current = &pcb[ 0 ];
 dispatch( ctx, NULL, &pcb[ 0 ] );
@@ -201,11 +237,59 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     break;
   }
 
+
+  case 0x02: { //read
+    int   fd = ( int   )( ctx->gpr[ 0 ] );
+    char*  x = ( char* )( ctx->gpr[ 1 ] );
+    int    n = ( int   )( ctx->gpr[ 2 ] );
+
+    for( int i = 0; i < n; i++ ) {
+      x[i] = PL011_getc( UART0, true );
+
+  }
+  ctx->gpr[ 0 ] = n;
+  break;
+}
+
+  case 0x04 : { // exit
+    int current_pcb_index = find_current_pcb();
+    pcb[current_pcb_index].status = STATUS_TERMINATED;
+    pcb[current_pcb_index].pri = 0;
+    pcb[current_pcb_index].age = 0;
+    schedule(ctx);
+
+
+
+    break;
+
+  }
+
+  case 0x03 : { // fork
+
+
+    int free_pcb = next_pcb_slot();
+
+
+    memset( &pcb[ free_pcb ], 0, sizeof( pcb_t ) );     // child
+      pcb[ free_pcb ].pid      = programme_count + 1;
+      pcb[ free_pcb ].status   = STATUS_CREATED;
+      pcb[ free_pcb ].ctx.cpsr = 0x50;
+      pcb[ free_pcb ].ctx.pc   = ( uint32_t )( &tos_generic - (free_pcb - 1) * 0x00001000);
+      pcb[ free_pcb ].ctx.sp   = ( uint32_t )( &tos_generic  );
+      pcb[free_pcb].age = 1;
+      pcb[free_pcb].pri = 1;
+
+      programme_count = programme_count + 1;
+
+
+  }
+
   default   : { // 0x?? => unknown/unsupported
       break;
     }
-  }
+
 
 
   return;
+}
 }
