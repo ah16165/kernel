@@ -41,7 +41,7 @@
 
 typedef int pid_t;
 
-#define program_max 3
+#define program_max 32
 
 typedef enum {
   STATUS_CREATED,
@@ -60,6 +60,7 @@ typedef struct {
   status_t status;
      ctx_t    ctx;
      int pri;
+     int age;
 } pcb_t;
 
 #endif

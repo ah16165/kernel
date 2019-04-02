@@ -11,6 +11,19 @@
 pcb_t pcb[ program_max ];
 pcb_t* current = NULL;
 
+int find_current_pcb(){
+  int j=0;
+  while(j< program_max){
+     if(pcb[j].pid == current->pid){
+       return j;
+     }
+     j++;
+
+     }
+
+
+}
+
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
 
@@ -37,38 +50,38 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
 
 void schedule( ctx_t* ctx ) {
 int i = 0;
-int j = 0;
 int k = 0;
 int current_pcb_index;
 int next_pcb_index = 0;
 
+// Define max program dynamically
+
+
+
+
 //age all programs by 1
 while(i< program_max){
-  pcb[i].pri = pcb[i].pri + 1;
+  if (pcb[i].pri != 0){
+    pcb[i].age = pcb[i].age + 1;}
   i++;
 
 }
 
 // find the current program pcb index
- while(j< program_max){
-    if(pcb[j].pid == current->pid){
-      current_pcb_index = j;
-    }
-    j++;
 
-    }
+current_pcb_index = find_current_pcb();
 
 // find the next program pcb index
 while(k< program_max){
-   if(pcb[k].pri > pcb[next_pcb_index].pri){
+   if((pcb[k].pri + pcb[k].age > pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
      next_pcb_index = k;
    }
    k++;
    }
 
 
-//set the next pcb priority to 0
-pcb[next_pcb_index].pri = 0;
+//set the next pcb age to 0
+pcb[next_pcb_index].age = 0;
 
 
 // if the next and the current are the same then do nothing
@@ -79,11 +92,12 @@ else{
 
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
 
-current = &pcb[next_pcb_index];
-TIMER0->Timer1IntClr = 0x01;  
+
+TIMER0->Timer1IntClr = 0x01;
 
 pcb[current_pcb_index].status = STATUS_READY;
-pcb[next_pcb_index].status = STATUS_EXECUTING;}
+pcb[next_pcb_index].status = STATUS_EXECUTING;
+current = &pcb[next_pcb_index];}
 
 return;
 
@@ -130,6 +144,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[ 0 ].ctx.cpsr = 0x50;
     pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_P3 );
     pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_P3  );
+    pcb[0].age = 0;
+    pcb[0].pri = 10;
 
     memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
     pcb[ 1 ].pid      = 2;
@@ -137,6 +153,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[ 1 ].ctx.cpsr = 0x50;
     pcb[ 1 ].ctx.pc   = ( uint32_t )( &main_P4 );
     pcb[ 1 ].ctx.sp   = ( uint32_t )( &tos_P4  );
+    pcb[1].age = 0;
+    pcb[1].pri = 10;
 
     memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
     pcb[ 2 ].pid      = 3;
@@ -144,6 +162,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[ 2 ].ctx.cpsr = 0x50;
     pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P5 );
     pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P5  );
+    pcb[2].age = 0;
+    pcb[2].pri = 20;
 
 current = &pcb[ 0 ];
 dispatch( ctx, NULL, &pcb[ 0 ] );
@@ -202,11 +222,36 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     break;
   }
 
+
+  case 0x02: { //read
+    int   fd = ( int   )( ctx->gpr[ 0 ] );
+    char*  x = ( char* )( ctx->gpr[ 1 ] );
+    int    n = ( int   )( ctx->gpr[ 2 ] );
+
+    for( int i = 0; i < n; i++ ) {
+      x[i] = PL011_getc( UART0, true );
+
+  }}
+
+  case 0x04 : { // exit
+    int current_pcb_index = find_current_pcb();
+    pcb[current_pcb_index].status = STATUS_TERMINATED;
+    pcb[current_pcb_index].pri = 0;
+    pcb[current_pcb_index].age = 0;
+    schedule(ctx);
+
+
+
+    break;
+
+  }
+
   default   : { // 0x?? => unknown/unsupported
       break;
     }
-  }
+
 
 
   return;
+}
 }
