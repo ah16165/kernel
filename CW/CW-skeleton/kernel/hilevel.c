@@ -175,6 +175,9 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[ j ].ctx.cpsr = 0x50;
     pcb[ j ].ctx.pc   = ( uint32_t )( &main_P3 );
     pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
+    pcb[j].age = 0;
+    pcb[j].pri = 0;
+
     j++;
     }
 
@@ -293,7 +296,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       //Set child PCB and pid
       memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
-      pcb[child_pcb].pid      = programme_count + 1;
+      pcb[child_pcb].pid      = child_pcb;
 
 
       // Set age, priority and state to parent's
@@ -304,7 +307,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       // Set Sp and status,
         pcb[child_pcb].ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
-        pcb[child_pcb].status = STATUS_READY;
+        pcb[child_pcb].status = STATUS_EXECUTING;
 
 
       //return 0 for child, PID of cvhild for parent
