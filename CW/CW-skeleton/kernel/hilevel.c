@@ -327,6 +327,9 @@ break;
 
   case 0x05 :{ //exec
 
+    ctx->sp = tos_general;
+    ctx->cpsr = 0x50;
+
     // set pc to start of new function
     ctx->pc = ctx->gpr[0];
 
