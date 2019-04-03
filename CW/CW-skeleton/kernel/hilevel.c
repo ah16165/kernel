@@ -31,11 +31,6 @@ int free_pcb_slot(){
     if (pcb[i].pri == 0){
       return i;
     }
-    else{
-      if (pcb[i] == NULL){
-        return i;
-      }
-    }
     i++;
   }
 }
@@ -117,13 +112,14 @@ return;
 
 
 
-// extern void     main_P3();
+extern void     main_P3();
 // extern uint32_t tos_P3;
-// extern void     main_P4();
+extern void     main_P4();
 // extern uint32_t tos_P4;
-// extern void     main_P5();
+extern void     main_P5();
 // extern uint32_t tos_P5;
 extern void     main_console();
+extern uint32_t tos_general;
 extern uint32_t tos_console;
 
 
@@ -173,11 +169,12 @@ void hilevel_handler_rst(ctx_t* ctx) {
     //initialise 1-32 blank pcb slots
     while(j<program_max){
     memset( &pcb[ i ], 0, sizeof( pcb_t ) );
-    pcb[ i ].pid      = i;
-    pcb[ i ].status   = STATUS_TERMINATED;
-    pcb[ i ].ctx.cpsr = 0x50;
-    pcb[ i ].ctx.pc   = ( uint32_t )( &main_P3 );
-    pcb[ i ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
+    pcb[ j ].pid      = i;
+    pcb[ j ].status   = STATUS_TERMINATED;
+    pcb[ j ].ctx.cpsr = 0x50;
+    pcb[ j ].ctx.pc   = ( uint32_t )( &main_P3 );
+    pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
+    j++;
     }
 
 
@@ -302,7 +299,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       pcb[child_pcb].age = pcb[parent_pcb].age;
       pcb[child_pcb].pri = pcb[parent_pcb].pri;
       memcpy( &pcb[ child_pcb ].ctx, ctx, sizeof( ctx_t ) );
-      pcb[child_pcb].ctx.pc = ctx.pc;
+      pcb[child_pcb].ctx.pc = ctx->pc;
 
       // Set Sp and status,
         pcb[child_pcb].ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
@@ -311,7 +308,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       //return 0 for child, PID of cvhild for parent
       pcb[child_pcb].ctx.gpr[0] = 0;
-      ctx.gpr[0] =  pcb[child_pcb].pid;
+      ctx->gpr[0] =  pcb[child_pcb].pid;
 
       programme_count = programme_count + 1;
 
