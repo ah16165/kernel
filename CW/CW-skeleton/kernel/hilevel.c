@@ -168,18 +168,18 @@ void hilevel_handler_rst(ctx_t* ctx) {
     programme_count++;
 
     //initialise 1-32 blank pcb slots
-    // while(j<program_max){
-    // memset( &pcb[ i ], 0, sizeof( pcb_t ) );
-    // pcb[ j ].pid      = i;
-    // pcb[ j ].status   = STATUS_READY;
-    // pcb[ j ].ctx.cpsr = 0x50;
-    // pcb[ j ].ctx.pc   = ( uint32_t )( &main_P3 );
-    // pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
-    // pcb[j].age = 0;
-    // pcb[j].pri = 0;
-    //
-    // j++;
-    // }
+    while(j<program_max){
+    memset( &pcb[ j ], 0, sizeof( pcb_t ) );
+    pcb[ j ].pid      = j;
+    pcb[ j ].status   = STATUS_READY;
+    pcb[ j ].ctx.cpsr = 0x50;
+    pcb[ j ].ctx.pc   = ( uint32_t )( &main_P3 );
+    pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
+    pcb[j].age = 0;
+    pcb[j].pri = 0;
+
+    j++;
+    }
 
 
 
