@@ -91,7 +91,7 @@ pcb[next_pcb_index].age = 0;
 
 
 // if the next and the current are the same then do nothing
-if (current_pcb_index == next_pcb_index || (next_pcb_index = 0)){return;}
+if (current_pcb_index == next_pcb_index){return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
