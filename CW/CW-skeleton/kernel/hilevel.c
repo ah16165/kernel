@@ -10,7 +10,7 @@
 
 pcb_t pcb[ program_max ];
 pcb_t* current = NULL;
-int programme_count = 0;
+int programme_count;
 
 int find_current_pcb(){
   int j=0;
@@ -134,6 +134,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
    */
    int i =0;
    int j =1;
+   programme_count = 0;
 
   TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer
@@ -164,13 +165,13 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[0].age = 100;
     pcb[0].pri = 100;
 
-    programme_count = 1;
+    programme_count++;
 
     //initialise 1-32 blank pcb slots
     while(j<program_max){
     memset( &pcb[ i ], 0, sizeof( pcb_t ) );
     pcb[ j ].pid      = i;
-    pcb[ j ].status   = STATUS_TERMINATED;
+    pcb[ j ].status   = STATUS_READY;
     pcb[ j ].ctx.cpsr = 0x50;
     pcb[ j ].ctx.pc   = ( uint32_t )( &main_P3 );
     pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
