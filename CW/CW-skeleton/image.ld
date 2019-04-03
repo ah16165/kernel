@@ -32,9 +32,9 @@ SECTIONS {
   .       = . + 0x00001000;
   tos_console  = .;
 
-  /* allocate stack for generic programmes          */
+  /* allocate stack for n programmes          */
   .       = . + 32 * 0x00001000;
-  tos_generic  = .;
+  tos_general  = .;
 
 
 }
