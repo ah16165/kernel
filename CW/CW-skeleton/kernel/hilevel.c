@@ -91,7 +91,7 @@ while(k< program_max){
 
 
 // if the next and the current are the same then do nothing
-if (current_pcb_index == next_pcb_index)){return;}
+if (current_pcb_index == next_pcb_index){return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
