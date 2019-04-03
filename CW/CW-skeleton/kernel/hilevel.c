@@ -159,7 +159,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
 
  // initialise console
   memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
-    pcb[ 0 ].pid      = 1;
+    pcb[ 0 ].pid      = 0;
     pcb[ 0 ].status   = STATUS_READY;
     pcb[ 0 ].ctx.cpsr = 0x50;
     pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
