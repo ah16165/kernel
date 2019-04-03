@@ -164,8 +164,8 @@ void hilevel_handler_rst(ctx_t* ctx) {
     pcb[ 0 ].ctx.cpsr = 0x50;
     pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
     pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_general  );
-    pcb[0].age = 100;
-    pcb[0].pri = 100;
+    pcb[0].age = 1;
+    pcb[0].pri = 1;
 
     programme_count++;
 
