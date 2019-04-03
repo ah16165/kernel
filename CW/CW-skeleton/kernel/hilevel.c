@@ -290,38 +290,31 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
   case 0x03 : { // fork
 
 
-      // int child_pcb = free_pcb_slot();
-      // int parent_pcb = find_current_pcb();
-      //
-      //
-      // //Set child PCB and pid
-      // memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
-      // pcb[child_pcb].pid      = child_pcb;
-      //
-      //
-      // // Set age, priority and state to parent's
-      // pcb[child_pcb].age = pcb[parent_pcb].age;
-      // pcb[child_pcb].pri = pcb[parent_pcb].pri;
-      // memcpy( &pcb[ child_pcb ].ctx, ctx, sizeof( ctx_t ) );
-      // pcb[child_pcb].ctx.pc = ctx->pc;
-      //
-      // // Set Sp and status,
-      //   pcb[child_pcb].ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
-      //   pcb[child_pcb].status = STATUS_EXECUTING;
-      //
-      //
-      // //return 0 for child, PID of cvhild for parent
-      // pcb[child_pcb].ctx.gpr[0] = 0;
-      // ctx->gpr[0] =  pcb[child_pcb].pid;
-      //
-      // programme_count = programme_count + 1;
+      int child_pcb = free_pcb_slot();
+      int parent_pcb = find_current_pcb();
 
-      // memcpy( &pcb[ free_pcb ].ctx, ctx, sizeof( ctx_t ) );
-      // pcb[ free_pcb ].pid      = programme_count + 1;
-      // pcb[ free_pcb ].status   = STATUS_EXECUTING;
-      // pcb[ free_pcb ].priority = ctx->gpr[0];
-      // pcb[ free_pcb ].priorityInc = ctx->gpr[0];
-      // pcb[ free_pcb ].program = -1;
+
+      //Set child PCB and pid
+      memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
+      pcb[child_pcb].pid      = child_pcb;
+
+
+      // Set age, priority and state to parent's
+      pcb[child_pcb].age = pcb[parent_pcb].age;
+      pcb[child_pcb].pri = pcb[parent_pcb].pri;
+      memcpy( &pcb[ child_pcb ].ctx, ctx, sizeof( ctx_t ) );
+      pcb[child_pcb].ctx.pc = ctx->pc;
+
+      // Set Sp and status,
+        pcb[child_pcb].ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
+        pcb[child_pcb].status = STATUS_EXECUTING;
+
+
+      //return 0 for child, PID of cvhild for parent
+      pcb[child_pcb].ctx.gpr[0] = 0;
+      ctx->gpr[0] =  pcb[child_pcb].pid;
+
+      programme_count = programme_count + 1;
 
 
 break;
@@ -333,7 +326,7 @@ break;
   case 0x05 :{ //exec
 
     // set pc to start of new function
-    // ctx->pc = ctx->gpr[0];
+    ctx->pc = ctx->gpr[0];
 
     break;
 
