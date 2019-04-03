@@ -112,12 +112,12 @@ return;
 
 
 
-// extern void     main_P3();
-// // extern uint32_t tos_P3;
-// extern void     main_P4();
-// // extern uint32_t tos_P4;
-// extern void     main_P5();
-// extern uint32_t tos_P5;
+extern void     main_P3();
+extern uint32_t tos_P3;
+extern void     main_P4();
+extern uint32_t tos_P4;
+extern void     main_P5();
+extern uint32_t tos_P5;
 extern void     main_console();
 extern uint32_t tos_general;
 extern uint32_t tos_console;
