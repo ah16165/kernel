@@ -79,7 +79,7 @@ current_pcb_index = find_current_pcb();
 
 // find the next program pcb index
 while(k< program_max){
-   if((pcb[k].pri + pcb[k].age > pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
+   if((pcb[k].pri + pcb[k].age >= pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
      next_pcb_index = k;
    }
    k++;
@@ -301,7 +301,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       // Set age, priority and state to parent's
       pcb[child_pcb].age = pcb[parent_pcb].age;
-      pcb[child_pcb].pri = pcb[parent_pcb].pri;
+      pcb[child_pcb].pri = pcb[parent_pcb].pri + 1;
       memcpy( &pcb[ child_pcb ].ctx, ctx, sizeof( ctx_t ) );
       pcb[child_pcb].ctx.pc = ctx->pc;
 
