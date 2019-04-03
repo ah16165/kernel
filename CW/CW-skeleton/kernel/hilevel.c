@@ -321,7 +321,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       // pcb[ free_pcb ].program = -1;
 
 
-
+break;
 
   }
 
