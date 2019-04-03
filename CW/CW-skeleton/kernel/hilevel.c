@@ -86,18 +86,18 @@ while(k< program_max){
    }
 
 
-
+pcb[next_pcb_index].age = 0;
 
 
 
 // if the next and the current are the same then do nothing
-if (current_pcb_index == next_pcb_index){return;}
+if (current_pcb_index == next_pcb_index || (next_pcb_index = 0)){return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
 
 //set the next pcb age to 0
-pcb[next_pcb_index].age = 0;
+
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
 
 
