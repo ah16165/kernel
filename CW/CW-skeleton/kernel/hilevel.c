@@ -305,9 +305,9 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       int parent_pcb = find_current_pcb();
       pcb_t* parent = current;
       pcb_t child = pcb[child_pcb];
-      char check = '0' + child_pcb;
-
-      PL011_putc( UART0, check,      true );
+      // char check = '0' + child_pcb;
+      //
+      // PL011_putc( UART0, check,      true );
 
 
       //Set child PCB and pid
@@ -315,11 +315,16 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child.pid  = child_pcb;
 
 
-      // Set age, priority and state to parent's
+      // Set age, priority and state
       child.age = 0;
       child.pri = 10;
       memcpy( &child.ctx, ctx, sizeof( ctx_t ) );
       child.ctx.pc = ctx->pc;
+
+
+      char check = '0' + child.pri;
+
+      PL011_putc( UART0, check,      true );
 
       // Set Sp and status,
       child.ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
