@@ -21,7 +21,7 @@ extern uint32_t tos_P5;
 extern void     main_console();
 extern uint32_t tos_general;
 extern uint32_t tos_console;
-uint32_t general = (uint32_t) (&tos_general);
+
 
 int find_current_pcb(){
   int j=0;
@@ -167,7 +167,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
       pcb[ j ].status   = STATUS_TERMINATED;
       pcb[ j ].ctx.cpsr = 0x50;
       pcb[ j ].ctx.pc   = ( uint32_t )( &main_console );
-      pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general - (0x00001000 * j));
+      pcb[ j ].ctx.sp   = (( uint32_t )(&tos_general)) - (0x00001000 * j);
       pcb[j].age = 0;
       pcb[j].pri = 0;
 
@@ -303,7 +303,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child.age = 0;
       child.pri = 3;
 
-      child.ctx.pc = ctx->pc;
+      // child.ctx.pc = ctx->pc;
 
 
       // char check = '0' + child.pri;
@@ -312,10 +312,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       // Set Sp and status,
 
-      uint32_t x = general -(0x00001000 * parent->pid) - ctx->sp;
+      uint32_t x =   ((uint32_t)(&tos_general)) -(0x00001000 * parent->pid) - ctx->sp;
 
 
-      child.ctx.sp = ( uint32_t )(general -(0x00001000 * parent->pid) - x);
+      child.ctx.sp = (( uint32_t )(&tos_general)) -(0x00001000 * parent->pid) - x);
       memcpy((void*)(child.ctx.sp), (void*)(ctx->sp),x);
 
 
@@ -341,7 +341,18 @@ break;
     // ctx->cpsr = 0x50;
 
     // set pc to start of new function
+
+
+
+
+
+
+
     ctx->pc = ctx->gpr[0];
+
+
+
+
     PL011_putc( UART0, 'e',      true );
 
     break;
