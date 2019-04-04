@@ -304,7 +304,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       int child_pcb = free_pcb_slot();
       int parent_pcb = find_current_pcb();
       pcb_t* parent = current;
-      pcb_t child = pcb[child_pcb];
+      pcb_t* child = pcb[child_pcb];
       // char check = '0' + child_pcb;
       //
       // PL011_putc( UART0, check,      true );
