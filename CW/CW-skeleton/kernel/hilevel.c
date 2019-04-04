@@ -318,14 +318,14 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       uint32_t x =   ((uint32_t)(&tos_general)) -(0x00001000 * parent->pid) - ctx->sp;
 
 
-      child.ctx.sp = (( uint32_t )(&tos_general)) -(0x00001000 * parent->pid) - x;
-      memcpy((void*)(child.ctx.sp), (void*)(ctx->sp),x);
+      child->ctx.sp = (( uint32_t )(&tos_general)) -(0x00001000 * parent->pid) - x;
+      memcpy((void*)(child->ctx.sp), (void*)(ctx->sp),x);
 
 
       // programme_count = programme_count + 1;
 
       //return 0 for child, PID of child for parent
-      child.ctx.gpr[0] = 0;
+      child->ctx.gpr[0] = 0;
       ctx->gpr[0] = child.pid;
 
 
