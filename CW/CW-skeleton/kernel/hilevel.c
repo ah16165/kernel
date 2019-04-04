@@ -36,14 +36,17 @@ int find_current_pcb(){
 
 }
 
-int free_pcb_slot(){
+pcb_t* free_pcb_slot(){
   int i =0;
+  int x = -1;
   while(i< program_max){
     if (pcb[i].status == STATUS_TERMINATED){
-      return i;
+    x = i;
+    break;
     }
     i++;
   }
+  return &pcb[x];
 }
 
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
@@ -283,10 +286,10 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
   case 0x03 : { // fork
 
 
-      int child_pcb = free_pcb_slot();
+
       int parent_pcb = find_current_pcb();
       pcb_t* parent = current;
-      pcb_t child = pcb[child_pcb];
+      pcb_t* child = free_pcb_slot();
       // char check = '0' + child_pcb;
       //
       // PL011_putc( UART0, check,      true );
@@ -294,14 +297,14 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       //Set child PCB and pid
       // memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
-      child.pid  = child_pcb;
+      // child->pid  = child_pcb;
 
 
       // Set age, priority and state
-      memcpy( &child.ctx, ctx, sizeof( ctx_t ) );
-      child.status = STATUS_READY;
-      child.age = 0;
-      child.pri = 3;
+      memcpy( &child->ctx, ctx, sizeof( ctx_t ) );
+      child->status = STATUS_READY;
+      child->age = 0;
+      child->pri = 3;
 
       // child.ctx.pc = ctx->pc;
 
