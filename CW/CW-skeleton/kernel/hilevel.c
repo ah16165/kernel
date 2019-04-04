@@ -303,7 +303,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child.age = 0;
       child.pri = 3;
 
-      // child.ctx.pc = ctx->pc;
+      child.ctx.pc = ctx->pc;
 
 
       // char check = '0' + child.pri;
