@@ -167,7 +167,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
       pcb[ j ].status   = STATUS_TERMINATED;
       pcb[ j ].ctx.cpsr = 0x50;
       pcb[ j ].ctx.pc   = ( uint32_t )( &main_console );
-      pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general - (0x00001000 * j);
+      pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general - (0x00001000 * j));
       pcb[j].age = 0;
       pcb[j].pri = 0;
 
