@@ -21,6 +21,7 @@ extern uint32_t tos_P5;
 extern void     main_console();
 extern uint32_t tos_general;
 extern uint32_t tos_console;
+uint32_t general = (uint32_t) (&tos_general);
 
 int find_current_pcb(){
   int j=0;
@@ -304,7 +305,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       int child_pcb = free_pcb_slot();
       int parent_pcb = find_current_pcb();
       pcb_t* parent = current;
-      pcb_t* child = pcb[child_pcb];
+      pcb_t child = pcb[child_pcb];
       // char check = '0' + child_pcb;
       //
       // PL011_putc( UART0, check,      true );
@@ -312,30 +313,38 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       //Set child PCB and pid
       // memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
-      child->pid  = child_pcb;
+      child.pid  = child_pcb;
 
 
       // Set age, priority and state
-      child->age = 0;
-      child->pri = 10;
-      memcpy( &child->ctx, ctx, sizeof( ctx_t ) );
-      child->ctx.pc = ctx->pc;
+      memcpy( &child.ctx, ctx, sizeof( ctx_t ) );
+      child.status = STATUS_READY;
+      child.age = 0;
+      child.pri = 3;
+
+      // child.ctx.pc = ctx->pc;
 
 
-      char check = '0' + child->pri;
+      // char check = '0' + child.pri;
 
-      PL011_putc( UART0, check,      true );
+      // PL011_putc( UART0, check,      true );
 
       // Set Sp and status,
-      child->ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
-      child->status = STATUS_READY;
 
+      uint32_t x = general -(0x00001000 * parent->pid) - ctx->sp;
+
+
+      child.ctx.sp = ( uint32_t )(general -(0x00001000 * parent->pid) - x);
+      memcpy((void*)(child.ctx.sp), (void*)(ctx->sp),x);
+
+
+      // programme_count = programme_count + 1;
 
       //return 0 for child, PID of child for parent
-      child->ctx.gpr[0] = 0;
-      ctx->gpr[0] = child->pid;
+      child.ctx.gpr[0] = 0;
+      ctx->gpr[0] = child.pid;
 
-      programme_count = programme_count + 1;
+
       PL011_putc( UART0, 'f',      true );
 
 
