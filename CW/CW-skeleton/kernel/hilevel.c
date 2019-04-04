@@ -12,6 +12,16 @@ pcb_t pcb[ program_max ];
 pcb_t* current = NULL;
 int programme_count;
 
+extern void     main_P3();
+extern uint32_t tos_P3;
+extern void     main_P4();
+extern uint32_t tos_P4;
+extern void     main_P5();
+extern uint32_t tos_P5;
+extern void     main_console();
+extern uint32_t tos_general;
+extern uint32_t tos_console;
+
 int find_current_pcb(){
   int j=0;
   while(j< program_max){
@@ -28,7 +38,7 @@ int find_current_pcb(){
 int free_pcb_slot(){
   int i =0;
   while(i< program_max){
-    if (pcb[i].pri == 0){
+    if (pcb[i].status == STATUS_TERMINATED){
       return i;
     }
     i++;
@@ -55,7 +65,7 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
     PL011_putc( UART0, ']',      true );
 
                                // update   executing index   to P_{next}
-
+                               current = next;
   return;
 }
 
@@ -67,7 +77,7 @@ int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  if (pcb[i].pri != 0){
+  if ((pcb[i].status != STATUS_TERMINATED) ){
     pcb[i].age = pcb[i].age + 1;}
   i++;
 
@@ -84,18 +94,24 @@ while(k< program_max){
    }
    k++;
    }
+   char check = '0' + pcb[current_pcb_index].pid;
+   PL011_putc( UART0, check,      true );
 
 
-pcb[next_pcb_index].age = 0;
+
 
 
 
 // if the next and the current are the same then do nothing
-if (current_pcb_index == next_pcb_index || (next_pcb_index = 0)){return;}
+if (current == &pcb[next_pcb_index] ){
+  PL011_putc( UART0, 'x',      true );
+  pcb[next_pcb_index].age = 0;
+  return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
 
+PL011_putc( UART0, 'y',      true );
 //set the next pcb age to 0
 
 dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
@@ -106,6 +122,7 @@ TIMER0->Timer1IntClr = 0x01;
 pcb[current_pcb_index].status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;
 current = &pcb[next_pcb_index];}
+pcb[next_pcb_index].age = 0;
 
 return;
 
@@ -114,15 +131,7 @@ return;
 
 
 
-extern void     main_P3();
-extern uint32_t tos_P3;
-extern void     main_P4();
-extern uint32_t tos_P4;
-extern void     main_P5();
-extern uint32_t tos_P5;
-extern void     main_console();
-extern uint32_t tos_general;
-extern uint32_t tos_console;
+
 
 
 void hilevel_handler_rst(ctx_t* ctx) {
@@ -160,11 +169,11 @@ void hilevel_handler_rst(ctx_t* ctx) {
  // initialise console
   memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
     pcb[ 0 ].pid      = 0;
-    pcb[ 0 ].status   = STATUS_READY;
+    pcb[ 0 ].status   = STATUS_CREATED;
     pcb[ 0 ].ctx.cpsr = 0x50;
     pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
     pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_general  );
-    pcb[0].age = 1;
+    pcb[0].age = 0;
     pcb[0].pri = 1;
 
     programme_count++;
@@ -173,10 +182,10 @@ void hilevel_handler_rst(ctx_t* ctx) {
     while(j<program_max){
     memset( &pcb[ j ], 0, sizeof( pcb_t ) );
     pcb[ j ].pid      = j;
-    pcb[ j ].status   = STATUS_READY;
+    pcb[ j ].status   = STATUS_TERMINATED;
     pcb[ j ].ctx.cpsr = 0x50;
-    pcb[ j ].ctx.pc   = ( uint32_t )( &main_P3 );
-    pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general + i*0x00001000 );
+    pcb[ j ].ctx.pc   = ( uint32_t )( &main_console );
+    pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general - j*0x00001000 );
     pcb[j].age = 0;
     pcb[j].pri = 0;
 
@@ -294,29 +303,35 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       int child_pcb = free_pcb_slot();
       int parent_pcb = find_current_pcb();
+      pcb_t* parent = current;
+      pcb_t child = pcb[child_pcb];
+      char check = '0' + child_pcb;
+
+      PL011_putc( UART0, check,      true );
 
 
       //Set child PCB and pid
       // memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
-      pcb[child_pcb].pid      = child_pcb;
+      child.pid  = child_pcb;
 
 
       // Set age, priority and state to parent's
-      pcb[child_pcb].age = pcb[parent_pcb].age;
-      pcb[child_pcb].pri = pcb[parent_pcb].pri;
-      memcpy( &pcb[ child_pcb ].ctx, ctx, sizeof( ctx_t ) );
-      pcb[child_pcb].ctx.pc = ctx->pc;
+      child.age = 0;
+      child.pri = 10;
+      memcpy( &child.ctx, ctx, sizeof( ctx_t ) );
+      child.ctx.pc = ctx->pc;
 
       // Set Sp and status,
-      pcb[child_pcb].ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
-      pcb[child_pcb].status = STATUS_EXECUTING;
+      child.ctx.sp = ( uint32_t )( &(tos_general)+1000*programme_count );
+      child.status = STATUS_READY;
 
 
-      //return 0 for child, PID of cvhild for parent
-      pcb[child_pcb].ctx.gpr[0] = 0;
-      ctx->gpr[0] =  pcb[child_pcb].pid;
+      //return 0 for child, PID of child for parent
+      child.ctx.gpr[0] = 0;
+      ctx->gpr[0] = child.pid;
 
       programme_count = programme_count + 1;
+      PL011_putc( UART0, 'f',      true );
 
 
 break;
@@ -327,11 +342,12 @@ break;
 
   case 0x05 :{ //exec
 
-    ctx->sp = tos_general;
-    ctx->cpsr = 0x50;
+    // ctx->sp = tos_general;
+    // ctx->cpsr = 0x50;
 
     // set pc to start of new function
     ctx->pc = ctx->gpr[0];
+    PL011_putc( UART0, 'e',      true );
 
     break;
 
