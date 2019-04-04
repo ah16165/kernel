@@ -326,7 +326,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       //return 0 for child, PID of child for parent
       child->ctx.gpr[0] = 0;
-      ctx->gpr[0] = child.pid;
+      ctx->gpr[0] = child->pid;
 
 
       PL011_putc( UART0, 'f',      true );
