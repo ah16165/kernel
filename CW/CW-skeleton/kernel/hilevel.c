@@ -90,7 +90,7 @@ current_pcb_index = find_current_pcb();
 
 // find the next program pcb index
 while(k< program_max){
-   if((pcb[k].pri + pcb[k].age > pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
+   if((pcb[k].pri + pcb[k].age >= pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
      next_pcb_index = k;
    }
    k++;
@@ -115,15 +115,15 @@ else{
 PL011_putc( UART0, 'y',      true );
 //set the next pcb age to 0
 
-dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );
+dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );}
 
 
-TIMER0->Timer1IntClr = 0x01;
+// TIMER0->Timer1IntClr = 0x01;
 
 pcb[current_pcb_index].status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;
-current = &pcb[next_pcb_index];}
 pcb[next_pcb_index].age = 0;
+current = &pcb[next_pcb_index];
 
 return;
 
@@ -148,6 +148,36 @@ void hilevel_handler_rst(ctx_t* ctx) {
    int j =1;
    programme_count = 0;
 
+   // initialise console
+    memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
+      pcb[ 0 ].pid      = 0;
+      pcb[ 0 ].status   = STATUS_CREATED;
+      pcb[ 0 ].ctx.cpsr = 0x50;
+      pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
+      pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_general  );
+      pcb[0].age = 0;
+      pcb[0].pri = 1;
+
+      // programme_count++;
+
+      //initialise 1-32 blank pcb slots
+      while(j<program_max){
+      memset( &pcb[ j ], 0, sizeof( pcb_t ) );
+      pcb[ j ].pid      = j;
+      pcb[ j ].status   = STATUS_TERMINATED;
+      pcb[ j ].ctx.cpsr = 0x50;
+      pcb[ j ].ctx.pc   = ( uint32_t )( &main_console );
+      pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general - (0x00001000 * j);
+      pcb[j].age = 0;
+      pcb[j].pri = 0;
+
+      j++;
+      }
+
+  // current = &pcb[ 0 ];
+  dispatch( ctx, NULL, &pcb[ 0 ] );
+
+
   TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer
   TIMER0->Timer1Ctrl |= 0x00000040; // select periodic timer
@@ -167,56 +197,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
   //   pcb[i].pri = 0;
   // }
 
- // initialise console
-  memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
-    pcb[ 0 ].pid      = 0;
-    pcb[ 0 ].status   = STATUS_CREATED;
-    pcb[ 0 ].ctx.cpsr = 0x50;
-    pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
-    pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_general  );
-    pcb[0].age = 0;
-    pcb[0].pri = 1;
 
-    programme_count++;
-
-    //initialise 1-32 blank pcb slots
-    while(j<program_max){
-    memset( &pcb[ j ], 0, sizeof( pcb_t ) );
-    pcb[ j ].pid      = j;
-    pcb[ j ].status   = STATUS_TERMINATED;
-    pcb[ j ].ctx.cpsr = 0x50;
-    pcb[ j ].ctx.pc   = ( uint32_t )( &main_console );
-    pcb[ j ].ctx.sp   = ( uint32_t )( &tos_general - j*0x00001000 );
-    pcb[j].age = 0;
-    pcb[j].pri = 0;
-
-    j++;
-    }
-
-
-
-
-
-    // memset( &pcb[ 1 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
-    // pcb[ 1 ].pid      = 2;
-    // pcb[ 1 ].status   = STATUS_CREATED;
-    // pcb[ 1 ].ctx.cpsr = 0x50;
-    // pcb[ 1 ].ctx.pc   = ( uint32_t )( &main_P4 );
-    // pcb[ 1 ].ctx.sp   = ( uint32_t )( &tos_P4  );
-    // pcb[1].age = 0;
-    // pcb[1].pri = 10;
-    //
-    // memset( &pcb[ 2 ], 0, sizeof( pcb_t ) );     // initialise 1-st PCB = P_2
-    // pcb[ 2 ].pid      = 3;
-    // pcb[ 2 ].status   = STATUS_CREATED;
-    // pcb[ 2 ].ctx.cpsr = 0x50;
-    // pcb[ 2 ].ctx.pc   = ( uint32_t )( &main_P5 );
-    // pcb[ 2 ].ctx.sp   = ( uint32_t )( &tos_P5  );
-    // pcb[2].age = 0;
-    // pcb[2].pri = 5;
-
-current = &pcb[ 0 ];
-dispatch( ctx, NULL, &pcb[ 0 ] );
 
   return;
 }
