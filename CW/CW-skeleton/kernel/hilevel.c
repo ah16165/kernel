@@ -94,8 +94,8 @@ while(k< program_max){
    }
    k++;
    }
-   char check = '0' + pcb[current_pcb_index].pid;
-   PL011_putc( UART0, check,      true );
+   // char check = '0' + pcb[current_pcb_index].pid;
+   // PL011_putc( UART0, check,      true );
 
 
 
