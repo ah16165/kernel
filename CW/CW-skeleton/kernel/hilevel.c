@@ -254,8 +254,6 @@ break;
 
   case 0x05 :{ //exec
 
-    ctx->sp = tos_n;
-    ctx->cpsr = 0x50;
     ctx->pc = ctx->gpr[0];
 
     break;
