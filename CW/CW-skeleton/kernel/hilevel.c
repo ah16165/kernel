@@ -222,7 +222,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       int i =0;
       int z = -1;
       while(i< program_max){
-        if (pcb[i].status == STATUS_TERMINATED || pcb[i].pri = 0){
+        if (pcb[i].status == STATUS_TERMINATED || pcb[i].pri == 0){
         z = i;
         break;
         }
