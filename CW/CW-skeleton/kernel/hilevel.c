@@ -34,8 +34,8 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
     PL011_putc( UART0, next_pid, true );
     PL011_putc( UART0, ']',      true );
 
-                               // update   executing index   to P_{next}
-                               current = next;
+   // update   executing index   to P_{next}
+   current = next;
   return;
 }
 
@@ -47,16 +47,19 @@ int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  if ((pcb[i].status != STATUS_TERMINATED) ){
-    pcb[i].age = pcb[i].age + 1;}
+  if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri = -1) ){
+    break;
+    }
+  else{
+    pcb[i].age = pcb[i].age + 1;
+  }
   i++;
-
 }
 
 
 // find the next program pcb index
 while(k< program_max){
-   if((pcb[k].pri + pcb[k].age >= pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED)){
+   if((pcb[k].pri + pcb[k].age >= pcb[next_pcb_index].pri + pcb[next_pcb_index].age) && (pcb[k].status != STATUS_TERMINATED) && (pcb[k].pri != -1)){
      next_pcb_index = k;
    }
    k++;
@@ -227,7 +230,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
   case 0x04 : { // exit
     current->status = STATUS_TERMINATED;
-    current->pri = 0;
+    current->pri = -1
     current->age = 0;
     schedule(ctx);
 
