@@ -47,7 +47,7 @@ int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri = -1) ){
+  if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri == -1) ){
     break;
     }
   else{
