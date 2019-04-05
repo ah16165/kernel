@@ -47,8 +47,7 @@ int next_pcb_index = 0;
 
 //age all programs by 1
 while(i< program_max){
-  if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri == 0) ){
-    break;
+  if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri == 0) || pcb[i].status == STATUS_EXECUTING ){
     }
   else{
     pcb[i].age = pcb[i].age + 1;
@@ -73,6 +72,7 @@ if (current->pid == pcb[next_pcb_index].pid ){
 
 // otherwise do a dispatch and update excecution status
 else{
+
 
 current->status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;
@@ -189,7 +189,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     current->status = STATUS_TERMINATED;
     current->pri =0;
     current->age = 0;
-    schedule(ctx);
+    // schedule(ctx);
     break;
 
   }
@@ -244,7 +244,10 @@ break;
 
 
   case 0x06:{ // kill
-
+    pcb[ctx->gpr[0]].status = STATUS_TERMINATED;
+    pcb[ctx->gpr[0]].pri =0;
+    pcb[ctx->gpr[0]].age = 0;
+    // schedule(ctx);
 
     break;
 
