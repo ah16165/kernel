@@ -35,7 +35,7 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
     PL011_putc( UART0, ']',      true );
 
    // update   executing index   to P_{next}
-   current = next;
+  current = next;
   return;
 }
 
@@ -45,7 +45,7 @@ int k = 0;
 
 int next_pcb_index = 0;
 
-//age all programs by 1
+//age all waiting programs by 1
 while(i< program_max){
   if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri == 0) || pcb[i].status == STATUS_EXECUTING ){
     }
@@ -74,7 +74,9 @@ if (current->pid == pcb[next_pcb_index].pid ){
 else{
 
 
-current->status = STATUS_READY;
+if(current->status != STATUS_TERMINATED){
+  current->status = STATUS_READY;
+}   
 pcb[next_pcb_index].status = STATUS_EXECUTING;
 pcb[next_pcb_index].age = 0;
 
