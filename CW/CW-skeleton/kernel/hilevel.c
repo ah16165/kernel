@@ -212,10 +212,9 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         }
         i++;}
 
-      // if no available pcb slot, don't fork
+      // if no available pcb slot stop the kernel
       if (z == -1){
-        schedule(ctx);
-        break;
+        return -1;
       }
 
       // set child to the free pcb
