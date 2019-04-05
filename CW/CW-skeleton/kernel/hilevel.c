@@ -69,8 +69,8 @@ while(k< program_max){
 
 
 // if the next and the current are the same then do nothing
-if (current == &pcb[next_pcb_index] ){
-  pcb[next_pcb_index].age = 0;
+if (current->pid == pcb[next_pcb_index].pid ){
+  current->age = 0;
   return;}
 
 // otherwise do a dispatch and update excecution status'
