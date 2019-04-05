@@ -66,17 +66,12 @@ while(k< program_max){
    }
 
 
-
-
-
-
-
-// if the next and the current are the same then do nothing
+// if the next and the current are the same then reset age of current but thats it
 if (current->pid == pcb[next_pcb_index].pid ){
   current->age = 0;
   return;}
 
-// otherwise do a dispatch and update excecution status'
+// otherwise do a dispatch and update excecution status
 else{
 
 current->status = STATUS_READY;
@@ -98,14 +93,7 @@ return;
 
 
 void hilevel_handler_rst(ctx_t* ctx) {
-  /* Configure the mechanism for interrupt handling by
-   *
-   * - configuring timer st. it raises a (periodic) interrupt for each
-   *   timer tick,
-   * - configuring GIC st. the selected interrupts are forwarded to the
-   *   processor via the IRQ interrupt signal, then
-   * - enabling IRQ interrupts.
-   */
+
    int i =0;
    int j =1;
 
@@ -121,24 +109,25 @@ void hilevel_handler_rst(ctx_t* ctx) {
       pcb[0].pri = 1;
 
 
-      //initialise 1-32 blank pcb slots
+      //initialise 1-18 blank pcb slots
       while(j<program_max){
       memset( &pcb[ j ], 0, sizeof( pcb_t ) );
       pcb[ j ].pid      = j;
       pcb[ j ].status   = STATUS_TERMINATED;
       pcb[ j ].ctx.cpsr = 0x50;
       pcb[ j ].ctx.pc   = ( uint32_t )( &main_console );
-      pcb[ j ].ctx.sp   = (( uint32_t )(&tos_n)) - (0x00001000 * j);
+      pcb[ j ].ctx.sp   = (( uint32_t )(&tos_n)) - (j * 0x00001000 );
       pcb[j].age = 0;
       pcb[j].pri = 0;
 
       j++;
       }
 
-  // current = &pcb[ 0 ];
+  // dispatch to get the console running
   dispatch( ctx, NULL, &pcb[ 0 ] );
 
 
+  //setup the timer
   TIMER0->Timer1Load  = 0x00100000; // select period = 2^20 ticks ~= 1 sec
   TIMER0->Timer1Ctrl  = 0x00000002; // select 32-bit   timer
   TIMER0->Timer1Ctrl |= 0x00000040; // select periodic timer
@@ -151,14 +140,6 @@ void hilevel_handler_rst(ctx_t* ctx) {
   GICD0->CTLR         = 0x00000001; // enable GIC distributor
 
   int_enable_irq();
-
-  // // make all pcb = 0
-  // while(i<program_max){
-  //   memset( &pcb[ i ], 0, sizeof( pcb_t ) );
-  //   pcb[i].pri = 0;
-  // }
-
-
 
   return;
 }
@@ -185,18 +166,11 @@ GICC0->EOIR = id;
 }
 
 void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
-  /* Based on the identifier (i.e., the immediate operand) extracted from the
-   * svc instruction,
-   *
-   * - read  the arguments from preserved usr mode registers,
-   * - perform whatever is appropriate for this system call, then
-   * - write any return value back to preserved usr mode registers.
-   */
 
    switch( id ) {
+
      case 0x00 : { // 0x00 => yield()
        schedule( ctx );
-
        break;
      }
 
@@ -233,9 +207,6 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     current->pri = -1;
     current->age = 0;
     schedule(ctx);
-
-
-
     break;
 
   }
