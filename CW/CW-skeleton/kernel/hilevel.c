@@ -188,6 +188,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
     ctx->gpr[ 0 ] = n;
 
+
+
     break;
   }
 
@@ -196,6 +198,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     current->status = STATUS_TERMINATED;
     current->pri =0;
     current->age = 0;
+    PL011_putc( UART0, 'X',      true );
     break;
 
   }
@@ -243,6 +246,8 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child->ctx.gpr[0] = 0;
       ctx->gpr[0] = child->pid;
 
+      PL011_putc( UART0, 'F',      true );
+
 break;
 
   }
@@ -253,6 +258,8 @@ break;
     // Set PC
     ctx->pc = ctx->gpr[0];
 
+    PL011_putc( UART0, 'E',      true );
+
     break;
   }
 
@@ -262,7 +269,7 @@ break;
     pcb[ctx->gpr[0]].pri =0;
     pcb[ctx->gpr[0]].age = 0;
 
-
+    PL011_putc( UART0, 'K',      true );
     break;
 
   }
