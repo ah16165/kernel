@@ -214,6 +214,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       // if no available pcb slot, don't fork
       if (z == -1){
+        schedule(ctx);
         break;
       }
 

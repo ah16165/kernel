@@ -41,7 +41,7 @@
 
 typedef int pid_t;
 
-#define program_max 18
+#define program_max 5
 
 typedef enum {
   STATUS_CREATED,
