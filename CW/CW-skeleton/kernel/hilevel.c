@@ -76,7 +76,7 @@ else{
 
 if(current->status != STATUS_TERMINATED){
   current->status = STATUS_READY;
-}   
+}
 pcb[next_pcb_index].status = STATUS_EXECUTING;
 pcb[next_pcb_index].age = 0;
 
@@ -191,7 +191,6 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
     current->status = STATUS_TERMINATED;
     current->pri =0;
     current->age = 0;
-    // schedule(ctx);
     break;
 
   }
@@ -212,6 +211,13 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
         break;
         }
         i++;}
+
+      // if no available pcb slot, don't fork
+      if (z = -1){
+        break;
+      }
+
+      // set child to the free pcb
       child = &pcb[z];
 
 
@@ -249,7 +255,7 @@ break;
     pcb[ctx->gpr[0]].status = STATUS_TERMINATED;
     pcb[ctx->gpr[0]].pri =0;
     pcb[ctx->gpr[0]].age = 0;
-    // schedule(ctx);
+
 
     break;
 
