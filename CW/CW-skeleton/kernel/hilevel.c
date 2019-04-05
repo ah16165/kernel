@@ -15,18 +15,6 @@ extern uint32_t tos_n;
 extern uint32_t tos_console;
 
 
-int find_current_pcb(){
-  int j=0;
-  while(j< program_max){
-     if(pcb[j].pid == current->pid){
-       return j;
-     }
-     j++;
-     }
-}
-
-
-
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
 
@@ -65,9 +53,6 @@ while(i< program_max){
 
 }
 
-// find the current program pcb index
-
-// current_pcb_index = find_current_pcb();
 
 // find the next program pcb index
 while(k< program_max){
@@ -241,10 +226,9 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 }
 
   case 0x04 : { // exit
-    int current_pcb_index = find_current_pcb();
-    pcb[current_pcb_index].status = STATUS_TERMINATED;
-    pcb[current_pcb_index].pri = 0;
-    pcb[current_pcb_index].age = 0;
+    current->status = STATUS_TERMINATED;
+    current->pri = 0;
+    current->age = 0;
     schedule(ctx);
 
 
@@ -256,7 +240,6 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
   case 0x03 : { // fork
 
       //Initislaise fork variables
-      int parent_pcb = find_current_pcb();
       pcb_t* parent = current;
       pcb_t* child;
 
