@@ -237,22 +237,14 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child->pri = parent->pri;
 
 
-      uint32_t x =   ((uint32_t)(&tos_n)) -(0x00001000 * parent->pid) - ctx->sp;
-
-
-      child->ctx.sp = (( uint32_t )(&tos_n)) -(0x00001000 * child->pid) - x;
-      memcpy((void*)(child->ctx.sp), (void*)(ctx->sp),x);
-
-
+      // Set child stack pointer
+      child->ctx.sp = (( uint32_t )(&tos_n)) -(0x00001000 * child->pid) - (((uint32_t)(&tos_n)) -(0x00001000 * parent->pid) - ctx->sp);
+      memcpy((void*)(child->ctx.sp), (void*)(ctx->sp), (((uint32_t)(&tos_n)) -(0x00001000 * parent->pid) - ctx->sp));
 
 
       //return 0 for child, PID of child for parent
       child->ctx.gpr[0] = 0;
       ctx->gpr[0] = child->pid;
-
-
-      PL011_putc( UART0, 'f',      true );
-
 
 break;
 
