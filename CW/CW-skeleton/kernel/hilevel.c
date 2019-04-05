@@ -88,10 +88,6 @@ return;
 }
 
 
-
-
-
-
 void hilevel_handler_rst(ctx_t* ctx) {
 
    int i =0;
@@ -106,7 +102,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
       pcb[ 0 ].ctx.pc   = ( uint32_t )( &main_console );
       pcb[ 0 ].ctx.sp   = ( uint32_t )( &tos_n  );
       pcb[0].age = 0;
-      pcb[0].pri = 1;
+      pcb[0].pri = 10;
 
 
       //initialise 1-18 blank pcb slots
@@ -234,7 +230,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       memcpy( &child->ctx, ctx, sizeof( ctx_t ) );
       child->status = STATUS_READY;
       child->age = 0;
-      child->pri = parent->pri;
+      child->pri = 5;
 
 
       // Set child stack pointer and copy stack
@@ -251,19 +247,18 @@ break;
   }
 
 
-
   case 0x05 :{ //exec
 
+    // Set PC
     ctx->pc = ctx->gpr[0];
 
     break;
   }
 
+
   default   : { // 0x?? => unknown/unsupported
       break;
     }
-
-
 
   return;
 }
