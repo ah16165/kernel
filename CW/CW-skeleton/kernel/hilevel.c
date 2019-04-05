@@ -237,7 +237,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child->pri = parent->pri;
 
 
-      // Set child stack pointer
+      // Set child stack pointer and copy stack
       child->ctx.sp = (( uint32_t )(&tos_n)) -(0x00001000 * child->pid) - (((uint32_t)(&tos_n)) -(0x00001000 * parent->pid) - ctx->sp);
       memcpy((void*)(child->ctx.sp), (void*)(ctx->sp), (((uint32_t)(&tos_n)) -(0x00001000 * parent->pid) - ctx->sp));
 
@@ -254,28 +254,11 @@ break;
 
   case 0x05 :{ //exec
 
-    // ctx->sp = tos_n;
-    // ctx->cpsr = 0x50;
-
-    // set pc to start of new function
-
-
-
-
-
-
-
+    ctx->sp = tos_n;
+    ctx->cpsr = 0x50;
     ctx->pc = ctx->gpr[0];
 
-
-
-
-    PL011_putc( UART0, 'e',      true );
-
     break;
-
-
-
   }
 
   default   : { // 0x?? => unknown/unsupported
