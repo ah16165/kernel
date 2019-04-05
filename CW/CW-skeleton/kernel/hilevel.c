@@ -50,7 +50,7 @@ while(i< program_max){
   if ((pcb[i].status == STATUS_TERMINATED) || (pcb[i].pri == 0) || pcb[i].status == STATUS_EXECUTING ){
     }
   else{
-    if(i = 0){
+    if(i == 0){
       pcb[i].age = pcb[i].age + 3;
     }
     else{
