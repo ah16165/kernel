@@ -51,7 +51,7 @@ while(i< program_max){
     }
   else{
     if(i == 0){
-      pcb[i].age = pcb[i].age + 3;
+      pcb[i].age = pcb[i].age + 2;
     }
     else{
     pcb[i].age = pcb[i].age + 1;
