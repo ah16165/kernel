@@ -185,18 +185,18 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
   }
 
 
-  case 0x02: { //read
-    int   fd = ( int   )( ctx->gpr[ 0 ] );
-    char*  x = ( char* )( ctx->gpr[ 1 ] );
-    int    n = ( int   )( ctx->gpr[ 2 ] );
-
-    for( int i = 0; i < n; i++ ) {
-      x[i] = PL011_getc( UART0, true );
-
-  }
-  ctx->gpr[ 0 ] = n;
-  break;
-}
+//   case 0x02: { //read
+//     int   fd = ( int   )( ctx->gpr[ 0 ] );
+//     char*  x = ( char* )( ctx->gpr[ 1 ] );
+//     int    n = ( int   )( ctx->gpr[ 2 ] );
+//
+//     for( int i = 0; i < n; i++ ) {
+//       x[i] = PL011_getc( UART0, true );
+//
+//   }
+//   ctx->gpr[ 0 ] = n;
+//   break;
+// }
 
   case 0x04 : { // exit
     current->status = STATUS_TERMINATED;
