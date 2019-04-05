@@ -91,7 +91,7 @@ if (current == &pcb[next_pcb_index] ){
 // otherwise do a dispatch and update excecution status'
 else{
 
-current.status = STATUS_READY;
+current->status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;
 pcb[next_pcb_index].age = 0;
 
@@ -263,14 +263,14 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
       // Find a free PCB slot for the child process
       int i =0;
-      int x = -1;
+      int z = -1;
       while(i< program_max){
         if (pcb[i].status == STATUS_TERMINATED){
-        x = i;
+        z = i;
         break;
         }
         i++;}
-      child = &pcb[x];
+      child = &pcb[z];
 
 
       // Set age, priority and state
