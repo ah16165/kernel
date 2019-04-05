@@ -222,7 +222,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       int i =0;
       int z = -1;
       while(i< program_max){
-        if (pcb[i].status == STATUS_TERMINATED){
+        if (pcb[i].status == STATUS_TERMINATED || pcb[i].pri = 0){
         z = i;
         break;
         }
@@ -234,7 +234,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       memcpy( &child->ctx, ctx, sizeof( ctx_t ) );
       child->status = STATUS_READY;
       child->age = 0;
-      child->pri = 3;
+      child->pri = parent->pri;
 
 
       uint32_t x =   ((uint32_t)(&tos_n)) -(0x00001000 * parent->pid) - ctx->sp;
