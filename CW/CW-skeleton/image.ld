@@ -33,8 +33,8 @@ SECTIONS {
   tos_console  = .;
 
   /* allocate stack for n programmes          */
-  .       = . + 32 * 0x00001000;
-  tos_general  = .;
+  .       = . + 18 * 0x00001000;
+  tos_n  = .;
 
 
 }

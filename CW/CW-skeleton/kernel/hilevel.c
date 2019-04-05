@@ -1,16 +1,8 @@
-/* Copyright (C) 2017 Daniel Page <csdsp@bristol.ac.uk>
- *
- * Use of this source code is restricted per the CC BY-NC-ND license, a copy of
- * which can be found via http://creativecommons.org (and should be included as
- * LICENSE.txt within the associated archive or repository).
- */
-
 #include "hilevel.h"
 
-
+// Initialise global variables, main progams and tos's
 pcb_t pcb[ program_max ];
 pcb_t* current = NULL;
-int programme_count;
 
 extern void     main_P3();
 extern uint32_t tos_P3;
@@ -30,24 +22,10 @@ int find_current_pcb(){
        return j;
      }
      j++;
-
      }
-
-
 }
 
-pcb_t* free_pcb_slot(){
-  int i =0;
-  int x = -1;
-  while(i< program_max){
-    if (pcb[i].status == STATUS_TERMINATED){
-    x = i;
-    break;
-    }
-    i++;
-  }
-  return &pcb[x];
-}
+
 
 void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
   char prev_pid = '?', next_pid = '?';
@@ -76,7 +54,7 @@ void dispatch( ctx_t* ctx, pcb_t* prev, pcb_t* next ) {
 void schedule( ctx_t* ctx ) {
 int i = 0;
 int k = 0;
-int current_pcb_index;
+// int current_pcb_index;
 int next_pcb_index = 0;
 
 //age all programs by 1
@@ -89,7 +67,7 @@ while(i< program_max){
 
 // find the current program pcb index
 
-current_pcb_index = find_current_pcb();
+// current_pcb_index = find_current_pcb();
 
 // find the next program pcb index
 while(k< program_max){
@@ -98,8 +76,7 @@ while(k< program_max){
    }
    k++;
    }
-   // char check = '0' + pcb[current_pcb_index].pid;
-   // PL011_putc( UART0, check,      true );
+
 
 
 
@@ -108,25 +85,19 @@ while(k< program_max){
 
 // if the next and the current are the same then do nothing
 if (current == &pcb[next_pcb_index] ){
-  PL011_putc( UART0, 'x',      true );
   pcb[next_pcb_index].age = 0;
   return;}
 
 // otherwise do a dispatch and update excecution status'
 else{
 
-PL011_putc( UART0, 'y',      true );
-//set the next pcb age to 0
-
-dispatch(ctx, &pcb[current_pcb_index], &pcb[next_pcb_index] );}
-
-
-// TIMER0->Timer1IntClr = 0x01;
-
-pcb[current_pcb_index].status = STATUS_READY;
+current.status = STATUS_READY;
 pcb[next_pcb_index].status = STATUS_EXECUTING;
 pcb[next_pcb_index].age = 0;
-current = &pcb[next_pcb_index];
+
+
+dispatch(ctx, current, &pcb[next_pcb_index] );}
+
 
 return;
 
@@ -149,7 +120,7 @@ void hilevel_handler_rst(ctx_t* ctx) {
    */
    int i =0;
    int j =1;
-   programme_count = 0;
+
 
    // initialise console
     memset( &pcb[ 0 ], 0, sizeof( pcb_t ) );
@@ -161,7 +132,6 @@ void hilevel_handler_rst(ctx_t* ctx) {
       pcb[0].age = 0;
       pcb[0].pri = 1;
 
-      // programme_count++;
 
       //initialise 1-32 blank pcb slots
       while(j<program_max){
@@ -285,19 +255,22 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
   case 0x03 : { // fork
 
-
-
+      //Initislaise fork variables
       int parent_pcb = find_current_pcb();
       pcb_t* parent = current;
-      pcb_t* child = free_pcb_slot();
-      // char check = '0' + child_pcb;
-      //
-      // PL011_putc( UART0, check,      true );
+      pcb_t* child;
 
 
-      //Set child PCB and pid
-      // memset( &pcb[ child_pcb ], 0, sizeof( pcb_t ) );
-      // child->pid  = child_pcb;
+      // Find a free PCB slot for the child process
+      int i =0;
+      int x = -1;
+      while(i< program_max){
+        if (pcb[i].status == STATUS_TERMINATED){
+        x = i;
+        break;
+        }
+        i++;}
+      child = &pcb[x];
 
 
       // Set age, priority and state
@@ -306,14 +279,6 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       child->age = 0;
       child->pri = 3;
 
-      // child.ctx.pc = ctx->pc;
-
-
-      // char check = '0' + child.pri;
-
-      // PL011_putc( UART0, check,      true );
-
-      // Set Sp and status,
 
       uint32_t x =   ((uint32_t)(&tos_general)) -(0x00001000 * parent->pid) - ctx->sp;
 
@@ -322,7 +287,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
       memcpy((void*)(child->ctx.sp), (void*)(ctx->sp),x);
 
 
-      // programme_count = programme_count + 1;
+
 
       //return 0 for child, PID of child for parent
       child->ctx.gpr[0] = 0;
