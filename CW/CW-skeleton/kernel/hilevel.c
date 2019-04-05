@@ -230,7 +230,7 @@ void hilevel_handler_svc( ctx_t* ctx, uint32_t id ) {
 
   case 0x04 : { // exit
     current->status = STATUS_TERMINATED;
-    current->pri = -1
+    current->pri = -1;
     current->age = 0;
     schedule(ctx);
 
